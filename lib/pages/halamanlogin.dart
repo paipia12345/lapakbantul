@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'halamandaftar.dart';
-import 'models/user_data.dart';
-import 'package:buyayak/models/login_google.dart';
+import '../models/user_data.dart';
+import '../models/login_google.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -202,29 +202,29 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 15),
 
                   SizedBox(
-  width: double.infinity,
-  child: OutlinedButton.icon(
-    style: OutlinedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      side: const BorderSide(color: Color.fromARGB(255, 77, 77, 77)),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    onPressed: () {
-      // Panggil fungsi dari file login_google.dart yang dipisah tadi
-      LoginGoogleService.prosesLoginGoogle(context, showMessage);
-    },
-    icon: Image.asset(
-      'assets/images/google.jpg',
-      height: 24,
-    ),
-    label: const Text(
-      "Masuk dengan Google",
-      style: TextStyle(color: Color.fromARGB(255, 48, 45, 45), fontSize: 16, fontWeight: FontWeight.bold),
-    ),
-  ),
-),
+                     width: double.infinity,
+                     child: OutlinedButton.icon(
+                       style: OutlinedButton.styleFrom(
+                         padding: const EdgeInsets.symmetric(vertical: 12),
+                         side: const BorderSide(color: Color.fromARGB(255, 77, 77, 77)),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                       ),
+                       onPressed: () {
+                         // Panggil fungsi dari file login_google.dart yang dipisah tadi
+                         LoginGoogleService.prosesLoginGoogle(context, showMessage);
+                       },
+                       icon: Image.asset(
+                         'assets/images/google.jpg',
+                         height: 24,
+                       ),
+                       label: const Text(
+                         "Masuk dengan Google",
+                         style: TextStyle(color: Color.fromARGB(255, 48, 45, 45), fontSize: 16, fontWeight: FontWeight.bold),
+                       ),
+                     ),
+                   ),
                 ],
               ),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models/user_data.dart'; // Import simulasi database di atas
-import 'package:buyayak/halamanlogin.dart';
+import '../models/user_data.dart'; // Import simulasi database di atas
+import '../pages/halamanlogin.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -58,30 +58,30 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Input: Number
                   // Input: Number dengan validasi angka dan panjang karakter
-_buildTextField(
-  controller: phoneController,
-  hintText: 'Nomor',
-  // Mengatur agar keyboard yang muncul hanya angka (opsional namun direkomendasikan)
-  keyboardType: TextInputType.number, 
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Nomor tidak boleh kosong';
-    }
-    
-    // Validasi 1: Memastikan input HANYA berisi angka (tidak boleh ada huruf/simbol)
-    final numRegExp = RegExp(r'^[0-9]+$');
-    if (!numRegExp.hasMatch(value)) {
-      return 'Harus berisi nomor';
-    }
-    
-    // Validasi 2: Memastikan panjang nomor harus tepat 10 digit
-    if (value.length != 10) {
-      return 'Nomor harus 10 digit'; // Jika ingin minimal 10 digit, ganti menjadi: value.length < 10
-    }
-    
-    return null;
-  },
-),
+                  _buildTextField(
+                    controller: phoneController,
+                    hintText: 'Nomor',
+                    // Mengatur agar keyboard yang muncul hanya angka (opsional namun direkomendasikan)
+                    keyboardType: TextInputType.number, 
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nomor tidak boleh kosong';
+                      }
+                      
+                      // Validasi 1: Memastikan input HANYA berisi angka (tidak boleh ada huruf/simbol)
+                      final numRegExp = RegExp(r'^[0-9]+$');
+                      if (!numRegExp.hasMatch(value)) {
+                        return 'Harus berisi nomor';
+                      }
+                      
+                      // Validasi 2: Memastikan panjang nomor harus tepat 10 digit
+                      if (value.length != 10) {
+                        return 'Nomor harus 10 digit'; // Jika ingin minimal 10 digit, ganti menjadi: value.length < 10
+                      }
+                      
+                      return null;
+                    },
+                  ),
                   const SizedBox(height: 16),
 
                   // Input: Email dengan validasi '@'
