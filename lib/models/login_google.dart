@@ -1,80 +1,79 @@
 // login_google.dart
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'user_data.dart';
-import 'package:buyayak/pages/home_page.dart';
-import 'package:buyayak/pages/halamandaftar.dart'; // Pastikan import halaman daftar kamu
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../pages/home_page.dart';
 
 class LoginGoogleService {
+  // Inisialisasi GoogleSignIn dan FirebaseAuth
+  static final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
   static Future<void> prosesLoginGoogle(
     BuildContext context,
     Function(String, Color) showMessage,
   ) async {
-    showMessage("Menghubungkan ke Google...", Colors.blue);
-
-    // Simulasi email dari Google Account
-    String? googleEmail = UserData.registeredEmail;
-    String? passwordOtomatis = (googleEmail == "eve.holt@reqres.in")
-        ? "pistol"
-        : "google_password_123";
-
-    if (googleEmail == null || googleEmail.isEmpty) {
-      showMessage(
-        "Akun Google belum terdaftar! Silakan daftar dahulu.",
-        Colors.orange,
-      );
-
-      await Future.delayed(const Duration(milliseconds: 1500));
-      if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterPage()),
-        );
-      }
-      return;
-    }
-
-    // ALUR 2: Cek Login langsung ke Reqres menggunakan akun Google tersebut
-    final urlLogin = Uri.parse('https://reqres.in/api/login');
     try {
-      final logResponse = await http.post(
-        urlLogin,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': googleEmail, 'password': passwordOtomatis}),
+      showMessage("Menghubungkan ke Google...", Colors.blue);
+
+      // 1. Munculkan pop-up pilihan akun Google di HP user
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // Jika user membatalkan pilihan akun Google
+        showMessage("Login dibatalkan oleh pengguna", Colors.orange);
+        return;
+      }
+
+      // 2. Ambil detail autentikasi dari akun Google yang dipilih
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // 3. Buat kredensial baru untuk dikirim ke Firebase
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
-      if (logResponse.statusCode == 200) {
-        // Jika ternyata di server Reqres akun ini ada dan sukses login
-        showMessage("Login Google Berhasil!", Colors.green);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        // ALUR 3: JIKA GAGAL LOGIN / BELUM TERDAFTAR (Muncul error dari Reqres)
-        showMessage("Akun Google belum terdaftar di aplikasi!", Colors.orange);
+      showMessage("Menyelaraskan dengan Firebase...", Colors.blue);
 
-        // Beri jeda 1.5 detik agar user sempat membaca pesan di atas, lalu lempar ke halaman daftar
-        await Future.delayed(const Duration(milliseconds: 1500));
+      // 4. Masuk ke Firebase menggunakan kredensial Google
+      // Alur Firebase otomatis: Jika email BELUM TERDAFTAR, Firebase akan otomatis membuatkan akun (Daftar).
+      // Jika email SUDAH TERDAFTAR, Firebase akan langsung meloginkannya (Login).
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Mengecek apakah ini adalah user yang baru pertama kali mendaftar (New User)
+        if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+          showMessage(
+            "Akun Google berhasil didaftarkan secara otomatis!",
+            Colors.green,
+          );
+        } else {
+          showMessage("Login Google Berhasil!", Colors.green);
+        }
+
+        // Beri jeda sedikit agar snackbar terbaca, lalu pindah ke HomePage
+        await Future.delayed(const Duration(milliseconds: 1000));
 
         if (context.mounted) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const RegisterPage()),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         }
       }
+    } on FirebaseAuthException catch (e) {
+      // Menangkap eror spesifik dari Firebase
+      showMessage("Firebase Error: ${e.message}", Colors.red);
     } catch (e) {
-      // Jika terjadi kesalahan jaringan atau eror lainnya, amankan dengan melempar ke halaman daftar juga
-      showMessage("Gagal terhubung, silakan daftar manual", Colors.red);
-
-      if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterPage()),
-        );
-      }
+      // Menangkap eror jaringan atau eror lainnya
+      showMessage("Gagal terhubung ke Google Sign-In", Colors.red);
+      print("Detail Error Google SSO: $e");
     }
   }
 }
