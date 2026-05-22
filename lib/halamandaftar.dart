@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'user_data.dart'; // Import simulasi database di atas
-import 'halamanlogin.dart';
+import 'models/user_data.dart'; // Import simulasi database di atas
+import 'package:buyayak/halamanlogin.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -26,7 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
         backgroundColor: color,
         duration: const Duration(seconds: 2),
       ),
-    );
+    ); 
   }
 
   @override
@@ -143,7 +143,7 @@ _buildTextField(
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF63B3A6),
+                        backgroundColor: const Color.fromARGB(255, 34, 34, 34),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
